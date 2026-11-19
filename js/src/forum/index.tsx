@@ -26,7 +26,7 @@ app.initializers.add('ernestdefoe-skylight', () => {
       <Tooltip text={label}>
         <Button
           className="Button Button--flat Skylight-studioButton"
-          icon="fas fa-palette"
+          icon="fas fa-sliders-h"
           aria-label={label as any}
           onclick={() => app.modal.show(() => import('./components/StudioModal'))}
         >

@@ -66,6 +66,11 @@ html[data-sky] .Skylight-studioButton.Button:hover,
 html[data-sky] .Skylight-studioButton.Button:focus-visible {
   background: ~"color-mix(in srgb, var(--primary-color) 18%, transparent)";
 }
+// On a colored header the accent pill would vanish into it: use the header's own colors.
+html[data-sky][data-colored-header="true"] .App-header .Skylight-studioButton.Button {
+  color: var(--header-control-color);
+  background: var(--header-control-bg);
+}
 
 // ---- Heroes ----
 html[data-sky] .Hero {
@@ -123,8 +128,10 @@ html[data-sky] .Button--primary.disabled {
   box-shadow: none;
 }
 
-// Focus: a 2px accent ring with a pane-colored gap, visible on glass and solid.
-html[data-sky] :focus-visible {
+// Focus: a 2px accent ring with a pane-colored gap, visible on glass and
+// solid. Text fields keep core's own focus style (a ring around a field you
+// are typing in is noise).
+html[data-sky] :focus-visible:not(input, textarea, select, [contenteditable]) {
   outline: 2px solid var(--primary-color);
   outline-offset: 2px;
 }

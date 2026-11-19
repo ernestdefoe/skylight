@@ -35,7 +35,7 @@ export default class StudioModal extends Modal<IInternalModalAttrs> {
   }
 
   title() {
-    return [<Icon name="fas fa-palette" className="Skylight-studioIcon" />, ' ', t('title')];
+    return [<Icon name="fas fa-sliders-h" className="Skylight-studioIcon" />, ' ', t('title')];
   }
 
   content() {

@@ -7,7 +7,7 @@ app.initializers.add('ernestdefoe-skylight', () => {
     .registerPage(SkylightPage)
     .registerPermission(
       {
-        icon: 'fas fa-palette',
+        icon: 'fas fa-sliders-h',
         label: app.translator.trans('ernestdefoe-skylight.admin.permissions.use_studio'),
         permission: 'ernestdefoe-skylight.useStudio',
         allowGuest: true,

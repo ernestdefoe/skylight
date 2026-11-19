@@ -111,10 +111,19 @@ html[data-sky][data-theme^="dark"] {
   --sky-shadow: 0 1px 2px ~"rgba(0, 0, 0, .3)", 0 10px 30px ~"rgba(0, 0, 0, .35)";
 }
 
-// Core's colored header: the header keeps the forum's color, frosted.
-html[data-sky][data-colored-header="true"] .App-header,
-html[data-sky][data-colored-header="true"] .App-navigation {
-  --header-bg: ~"color-mix(in srgb, var(--header-bg-colored, var(--sky-accent)) 88%, transparent)";
+// Core's colored header: the header takes the accent, frosted, with text and
+// controls in the accent's own ink (white or near-black, whichever reads).
+html[data-sky][data-colored-header="true"] {
+  --header-bg: ~"color-mix(in srgb, @{accent} 90%, transparent)";
+  --header-color: @ink;
+  --header-control-bg: ~"rgba(255, 255, 255, .16)";
+  --header-control-color: @ink;
+}
+html[data-sky][data-colored-header="true"][data-theme^="dark"] {
+  --header-bg: ~"color-mix(in srgb, @{accent-dark} 82%, transparent)";
+  --header-color: @ink-dark;
+  --header-control-bg: ~"rgba(0, 0, 0, .16)";
+  --header-control-color: @ink-dark;
 }
 
 // ---- Studio: corners ----

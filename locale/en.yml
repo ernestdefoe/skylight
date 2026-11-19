@@ -71,8 +71,8 @@ ernestdefoe-skylight:
   forum:
     studio:
       open: Personalize
-      title: Studio
-      lead: Your look. Everyone else keeps the forum's.
+      title: Your look
+      lead: Only you see these changes. Everyone else keeps the forum's look.
       shuffle: Shuffle
       reset: Reset
       done: Done
@@ -97,17 +97,17 @@ ernestdefoe-skylight:
   admin:
     bespoke_notice: Bespoke is styling this forum, so Skylight stays off. To offer both, install Wardrobe and let members pick their theme.
     permissions:
-      use_studio: Personalize Skylight in the Studio
+      use_studio: Personalize Skylight (accent, background, list view…)
     defaults:
       title: Forum defaults
-      help: What guests and new members see. Members can change these in their Studio.
+      help: What guests and new members see. Members can change these with Personalize.
       contrast_light: "Accent on light: {ratio}"
       contrast_dark: "Accent on dark: {ratio}"
     studio:
-      title: Member Studio
-      help: The sections members get. A section you turn off stays on your default.
+      title: Member personalization
+      help: The sections members get when they open Personalize. A section you turn off stays on your default.
       readability_always: Reduce transparency and More contrast are always offered.
-      permission: Who can open the Studio is set on the Permissions page (Members, by default).
+      permission: Who can use Personalize is set on the Permissions page (Members, by default).
     presets:
       title: Your own accents
       help: Up to 6 extra colors for the accent row, separated by commas.

@@ -72,6 +72,12 @@ html[data-sky][data-colored-header="true"] .App-header .Skylight-studioButton.Bu
   background: var(--header-control-bg);
 }
 
+// The phone drawer: core paints it with the header color, which is
+// translucent here; it slides over the page, so it needs a solid pane.
+html[data-sky] .App-drawer {
+  background: var(--sky-pane-solid);
+}
+
 // ---- Heroes ----
 html[data-sky] .Hero {
   background: transparent;
@@ -126,14 +132,6 @@ html[data-sky] .Button--primary {
 html[data-sky] .Button--primary:disabled,
 html[data-sky] .Button--primary.disabled {
   box-shadow: none;
-}
-
-// Focus: a 2px accent ring with a pane-colored gap, visible on glass and
-// solid. Text fields keep core's own focus style (a ring around a field you
-// are typing in is noise).
-html[data-sky] :focus-visible:not(input, textarea, select, [contenteditable]) {
-  outline: 2px solid var(--primary-color);
-  outline-offset: 2px;
 }
 
 // Links inside content. 🚨 html:not(#x-sky) beats themes that color links

@@ -80,11 +80,19 @@ html[data-sky][data-sky-motion="off"] *::after {
   to { opacity: 1; transform: none; }
 }
 @media (prefers-reduced-motion: no-preference) {
-  html[data-sky][data-sky-motion="full"] .DiscussionList > .DiscussionList-discussions,
-  html[data-sky][data-sky-motion="full"] .sideNav > ul {
+  html[data-sky][data-sky-motion="full"] .DiscussionList > .DiscussionList-discussions {
     // 🚨 `backwards`, never `forwards`: a transform that keeps filling after
     // it ends leaves the pane a stacking context, and menus inside it would
     // paint under the next pane.
+    animation: skySettle .35s ease backwards;
+  }
+}
+// 🚨 Tablet and up only: on phones the sidebar list holds core's header
+// controls (the title and new-discussion buttons), absolutely positioned
+// against the page. A transform animation on their parent makes it their
+// containing block in Safari, and they drop out of the header.
+@media (prefers-reduced-motion: no-preference) and (min-width: 768px) {
+  html[data-sky][data-sky-motion="full"] .sideNav > ul {
     animation: skySettle .35s ease backwards;
   }
 }

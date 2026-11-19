@@ -26,8 +26,13 @@ html[data-sky] .ComposerBody,
 html[data-sky] .Composer:not(.minimized) {
   background: var(--sky-pane-strong);
 }
-html[data-sky] .Composer {
-  .sky-blur(20px);
+// 🚨 Tablet and up only: on phones the composer is full screen and holds
+// core's header controls, fixed to the viewport; a backdrop-filter would make
+// the composer their containing block (Safari).
+@media (min-width: 768px) {
+  html[data-sky] .Composer {
+    .sky-blur(20px);
+  }
 }
 html[data-sky] .FormControl {
   border-radius: var(--sky-radius-sm);

@@ -28,7 +28,11 @@ app.initializers.add('ernestdefoe-skylight', () => {
           className="Button Button--flat Skylight-studioButton"
           icon="fas fa-sliders-h"
           aria-label={label as any}
-          onclick={() => app.modal.show(() => import('./components/StudioModal'))}
+          onclick={() => {
+            // On phones the button sits in the drawer: close it so the page (the preview) shows.
+            app.drawer.hide();
+            app.modal.show(() => import('./components/StudioModal'));
+          }}
         >
           <span className="Button-label">{label}</span>
         </Button>

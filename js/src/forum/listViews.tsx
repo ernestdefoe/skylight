@@ -58,7 +58,8 @@ function viewSwitch(): JSX.Element {
 function extendList() {
   // filter[skylight]=cards asks the API for each discussion's excerpt (one query per page).
   extend(DiscussionListState.prototype, 'requestParams', function (params: any) {
-    if (document.documentElement.hasAttribute('data-sky') && currentView() === 'cards') params.filter = { ...(params.filter || {}), skylight: 'cards' };
+    if (document.documentElement.hasAttribute('data-sky') && currentView() === 'cards')
+      params.filter = { ...(params.filter || {}), skylight: 'cards' };
   });
 
   // A guest on Cards: the list preloaded into the page was built without the
@@ -70,7 +71,8 @@ function extendList() {
 
   extend(IndexPage.prototype, 'actionItems', function (items) {
     const p = payload();
-    if (document.documentElement.hasAttribute('data-sky') && p.canUseStudio && p.sections.includes('view')) items.add('skylightView', viewSwitch(), 20);
+    if (document.documentElement.hasAttribute('data-sky') && p.canUseStudio && p.sections.includes('view'))
+      items.add('skylightView', viewSwitch(), 20);
   });
 }
 

@@ -26,7 +26,13 @@ export function Segmented(label: Mithril.Children, value: string, options: [stri
   return (
     <div className="Skylight-seg" role="radiogroup" aria-label={typeof label === 'string' ? label : undefined}>
       {options.map(([v, text]) => (
-        <button type="button" role="radio" aria-checked={v === value ? 'true' : 'false'} className={v === value ? 'on' : ''} onclick={() => onchange(v)}>
+        <button
+          type="button"
+          role="radio"
+          aria-checked={v === value ? 'true' : 'false'}
+          className={v === value ? 'on' : ''}
+          onclick={() => onchange(v)}
+        >
           {text}
         </button>
       ))}
@@ -105,7 +111,9 @@ export default class LookControls extends Component<LookControlsAttrs> {
   }
 
   choice(key: keyof typeof CHOICES, icons: Record<string, string> = {}) {
-    const options = (CHOICES[key] as readonly string[]).map((v) => [v, [icons[v] && <Icon name={icons[v]} />, ' ', t(`choices.${key}.${v}`)]] as [string, Mithril.Children]);
+    const options = (CHOICES[key] as readonly string[]).map(
+      (v) => [v, [icons[v] && <Icon name={icons[v]} />, ' ', t(`choices.${key}.${v}`)]] as [string, Mithril.Children]
+    );
 
     return Segmented(t(`labels.${key}`), String(this.attrs.look[key]), options, (v) => this.attrs.onchange(key, v));
   }

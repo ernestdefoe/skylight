@@ -40,7 +40,10 @@ export default class SkylightPage extends ExtensionPage {
                 {this.sectionsCard()}
                 {this.presetsCard()}
                 {this.backgroundsCard()}
-                {this.card('more.title', null, [this.switch('ernestdefoe-skylight.tag_accent', 'more.tag_accent'), this.switch('ernestdefoe-skylight.auto_solid', 'more.auto_solid')])}
+                {this.card('more.title', null, [
+                  this.switch('ernestdefoe-skylight.tag_accent', 'more.tag_accent'),
+                  this.switch('ernestdefoe-skylight.auto_solid', 'more.auto_solid'),
+                ])}
               </div>
             </div>
             <div className="Form-group Form-controls">{this.submitButton()}</div>

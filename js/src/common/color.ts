@@ -35,7 +35,16 @@ export function contrast(a: string, b: string): number {
 function mix(a: string, b: string, amount: number): string {
   const ca = rgb(a);
   const cb = rgb(b);
-  return '#' + ca.map((c, i) => Math.round(c + (cb[i] - c) * amount).toString(16).padStart(2, '0')).join('');
+  return (
+    '#' +
+    ca
+      .map((c, i) =>
+        Math.round(c + (cb[i] - c) * amount)
+          .toString(16)
+          .padStart(2, '0')
+      )
+      .join('')
+  );
 }
 
 function reach(color: string, on: string, toward: string): string {

@@ -13,7 +13,12 @@ export function own(): Partial<Look> {
   const user = app.session.user;
   if (user) return sanitize(user.preferences()?.skylight);
 
-  return sanitize(parseJson<{ look?: unknown } | null>(storage((local) => local.getItem(KEY), null), null)?.look);
+  return sanitize(
+    parseJson<{ look?: unknown } | null>(
+      storage((local) => local.getItem(KEY), null),
+      null
+    )?.look
+  );
 }
 
 /** Put the visitor's look on the page (also the Studio's live preview). */

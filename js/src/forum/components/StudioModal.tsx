@@ -92,11 +92,7 @@ export default class StudioModal extends Modal<IInternalModalAttrs> {
         <legend>{t('share.label')}</legend>
         <div className="Skylight-share">
           <code>{encode(look)}</code>
-          <Button
-            className="Button"
-            icon="far fa-copy"
-            onclick={() => this.copy(encode(look))}
-          >
+          <Button className="Button" icon="far fa-copy" onclick={() => this.copy(encode(look))}>
             {t('share.copy')}
           </Button>
         </div>
@@ -119,12 +115,10 @@ export default class StudioModal extends Modal<IInternalModalAttrs> {
 
   copy(code: string) {
     // Without clipboard access (an insecure origin, or the visitor said no) the code stays on screen to copy by hand.
-    navigator.clipboard
-      ?.writeText(code)
-      .then(
-        () => app.alerts.show({ type: 'success' }, t('share.copied')),
-        () => app.alerts.show({ type: 'error' }, t('share.copy_failed'))
-      );
+    navigator.clipboard?.writeText(code).then(
+      () => app.alerts.show({ type: 'success' }, t('share.copied')),
+      () => app.alerts.show({ type: 'error' }, t('share.copy_failed'))
+    );
   }
 
   set(changes: Partial<Look>) {

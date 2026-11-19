@@ -19,12 +19,15 @@ use Psr\Http\Message\UploadedFileInterface;
 
 /**
  * POST /api/skylight/backgrounds/{slot}: core's own image upload (admin only,
- * the old file removed, the forum document returned), with the picture scaled
+ * checked by BackgroundValidator, the old file removed, the forum document
+ * returned), with the picture scaled
  * down to 2400 px and re-encoded as WebP so a big photo stays a light page.
  */
 class UploadBackgroundController extends UploadImageController
 {
     protected string $filenamePrefix = 'skylight-bg';
+
+    protected ?string $validator = BackgroundValidator::class;
 
     protected function makeImage(UploadedFileInterface $file): EncodedImageInterface
     {

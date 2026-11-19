@@ -108,7 +108,7 @@ final class Stamp
 
         if ($guest) {
             $js .= 'try{var o=JSON.parse(localStorage.getItem("skylight")||"null");'
-                .'if(o){for(var k in o.a)h.setAttribute(k,o.a[k]);if(o.s)h.style.cssText+=o.s}}catch(e){}';
+                .'if(o){for(var k in o.a)k.indexOf("data-sky")||h.setAttribute(k,o.a[k]);if(o.s)h.style.cssText+=o.s}}catch(e){}';
         }
 
         if ($autoSolid) {

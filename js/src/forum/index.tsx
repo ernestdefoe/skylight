@@ -8,6 +8,8 @@ import listViews from './listViews';
 import tagAccent from './tagAccent';
 import { show } from './own';
 
+export { default as extend } from './extend';
+
 app.initializers.add('ernestdefoe-skylight', () => {
   // A guest's look was copied on by the <head> script; this re-applies it
   // against the forum's current locks (and does nothing on another theme).

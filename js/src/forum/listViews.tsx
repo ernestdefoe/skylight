@@ -38,6 +38,13 @@ export default function listViews() {
     if (document.documentElement.hasAttribute('data-sky') && currentView() === 'cards') params.filter = { ...(params.filter || {}), skylight: 'cards' };
   });
 
+  // A guest on Cards: the list preloaded into the page was built without the
+  // guest's browser-held choice, so it has no excerpts. Fetch it once more.
+  extend(IndexPage.prototype, 'oncreate', function () {
+    const first = app.discussions?.getPages()?.[0]?.items?.[0];
+    if (currentView() === 'cards' && first && first.attribute('skylightExcerpt') === undefined) app.discussions.refresh();
+  });
+
   // The toolbar switch: three icons beside Refresh.
   extend(IndexPage.prototype, 'actionItems', function (items) {
     const p = payload();

@@ -9,6 +9,8 @@
 
 namespace ErnestDefoe\Skylight\Api;
 
+use ErnestDefoe\Skylight\ActiveTheme;
+use ErnestDefoe\Skylight\Look;
 use Flarum\Api\Context;
 use Flarum\Api\Resource\EloquentBuffer;
 use Flarum\Api\Schema;
@@ -19,8 +21,10 @@ use s9e\TextFormatter\Utils;
 /**
  * skylightExcerpt: two lines of the opening post for the Cards view.
  *
- * Sent only when the list asks for it (filter[skylight]=cards, which the forum adds
- * while a visitor is on Cards), so List and Compact pay nothing. The opening
+ * Sent only for Cards, so List and Compact pay nothing: when the reader's own
+ * look is Cards (which covers the list preloaded into the page), or when the
+ * list asks with filter[skylight]=cards (a guest whose Cards choice lives in
+ * their browser). The opening
  * posts of a page come through the relationship buffer in ONE query, scoped
  * by the posts resource (a post the reader can't see gives no excerpt), and
  * the text comes straight from the stored XML, with no formatter render. The
@@ -30,12 +34,19 @@ class DiscussionFields
 {
     public const LENGTH = 160;
 
+    /** @var \WeakMap<object, bool>|null per request */
+    private static ?\WeakMap $answers = null;
+
+    public function __construct(protected Look $look, protected ActiveTheme $theme)
+    {
+    }
+
     public function __invoke(): array
     {
         return [
             Schema\Str::make('skylightExcerpt')
                 ->nullable()
-                ->visible(fn (Discussion $discussion, Context $context) => self::wanted($context))
+                ->visible(fn (Discussion $discussion, Context $context) => $this->wanted($context))
                 ->get(function (Discussion $discussion, Context $context) {
                     if (! $discussion->relationLoaded('firstPost')) {
                         EloquentBuffer::add($discussion, 'firstPost');
@@ -65,8 +76,11 @@ class DiscussionFields
         ];
     }
 
-    public static function wanted(Context $context): bool
+    public function wanted(Context $context): bool
     {
-        return (($context->request->getQueryParams()['filter'] ?? [])['skylight'] ?? null) === 'cards';
+        self::$answers ??= new \WeakMap();
+
+        return self::$answers[$context->request] ??= (($context->request->getQueryParams()['filter'] ?? [])['skylight'] ?? null) === 'cards'
+            || ($this->theme->for($context->request) && $this->look->for($context->getActor())['look']['view'] === 'cards');
     }
 }

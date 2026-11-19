@@ -3,3 +3,4 @@
 /.github export-ignore
 /phpstan.neon export-ignore
 /pint.json export-ignore
+/screenshots export-ignore

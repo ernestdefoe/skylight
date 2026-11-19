@@ -9,6 +9,7 @@
 
 use ErnestDefoe\Skylight\Api;
 use ErnestDefoe\Skylight\Content;
+use ErnestDefoe\Skylight\Integration;
 use ErnestDefoe\Skylight\Look;
 use ErnestDefoe\Skylight\Search\ViewFilter;
 use Flarum\Api\Resource\DiscussionResource;
@@ -57,9 +58,22 @@ return [
     (new Extend\SearchDriver(DatabaseSearchDriver::class))
         ->addFilter(DiscussionSearcher::class, ViewFilter::class),
 
+    // Admin-only uploads of the four background pictures, on core's own image
+    // upload and delete controllers (no JSON:API resource: a slot is a setting
+    // holding a file path, not a model). The pattern routes only img1–img4.
     (new Extend\Routes('api'))
-        ->post('/skylight/backgrounds/{slot}', 'skylight.backgrounds.upload', Api\UploadBackgroundController::class)
-        ->delete('/skylight/backgrounds/{slot}', 'skylight.backgrounds.delete', Api\DeleteBackgroundController::class),
+        ->post('/skylight/backgrounds/{slot:img[1-4]}', 'skylight.backgrounds.upload', Api\UploadBackgroundController::class)
+        ->delete('/skylight/backgrounds/{slot:img[1-4]}', 'skylight.backgrounds.delete', Api\DeleteBackgroundController::class),
+
+    // Optional integrations, declared here so the rest of the code never asks
+    // whether another extension is installed (see ActiveTheme).
+    (new Extend\Conditional())
+        ->whenExtensionEnabled('ernestdefoe-wardrobe', fn () => [
+            (new Extend\ServiceProvider())->register(Integration\WardrobeProvider::class),
+        ])
+        ->whenExtensionEnabled('ernestdefoe-bespoke', fn () => [
+            (new Extend\ServiceProvider())->register(Integration\BespokeProvider::class),
+        ]),
 
     // 🚨 Keys written out, never read from class constants while this file
     // loads (a composer update mid-request would fatal every page).

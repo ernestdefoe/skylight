@@ -1,5 +1,6 @@
 import app from 'flarum/common/app';
 import { accents, hex } from './color';
+import { parseJson } from './safe';
 
 /**
  * A "look": every Studio choice. Mirrors src/Look.php (keep the two in step).
@@ -224,14 +225,8 @@ export const CURATED: Partial<Look>[] = [
 
 /** A list of hex colors from a JSON array or a comma-separated string. */
 export function hexList(value: unknown): string[] {
-  let items: unknown[] = [];
-  if (typeof value === 'string') {
-    try {
-      const parsed = JSON.parse(value);
-      items = Array.isArray(parsed) ? parsed : [];
-    } catch (e) {
-      items = value.split(/[\s,]+/);
-    }
-  }
+  if (typeof value !== 'string') return [];
+  const parsed = parseJson<unknown>(value, null);
+  const items: unknown[] = Array.isArray(parsed) ? parsed : value.trim().startsWith('[') ? [] : value.split(/[\s,]+/);
   return items.map((v) => hex(v)).filter((v): v is string => !!v);
 }

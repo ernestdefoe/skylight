@@ -7,6 +7,7 @@ import LookControls, { Segmented } from '../../common/components/LookControls';
 import { CURATED, decode, effective, encode, Look, LookKey, openKeys, payload } from '../../common/look';
 import { own, save, show } from '../own';
 import { currentView, reloadIfNeeded } from '../listViews';
+import { storage } from '../../common/safe';
 
 const t = (key: string, params?: any) => app.translator.trans(`ernestdefoe-skylight.forum.studio.${key}`, params);
 
@@ -94,7 +95,7 @@ export default class StudioModal extends Modal<IInternalModalAttrs> {
           <Button
             className="Button"
             icon="far fa-copy"
-            onclick={() => navigator.clipboard?.writeText(encode(look)).then(() => app.alerts.show({ type: 'success' }, t('share.copied')))}
+            onclick={() => this.copy(encode(look))}
           >
             {t('share.copy')}
           </Button>
@@ -114,6 +115,16 @@ export default class StudioModal extends Modal<IInternalModalAttrs> {
         {this.codeError && <p className="Skylight-note Skylight-note--error">{t('share.invalid')}</p>}
       </fieldset>
     );
+  }
+
+  copy(code: string) {
+    // Without clipboard access (an insecure origin, or the visitor said no) the code stays on screen to copy by hand.
+    navigator.clipboard
+      ?.writeText(code)
+      .then(
+        () => app.alerts.show({ type: 'success' }, t('share.copied')),
+        () => app.alerts.show({ type: 'error' }, t('share.copy_failed'))
+      );
   }
 
   set(changes: Partial<Look>) {
@@ -156,11 +167,8 @@ export default class StudioModal extends Modal<IInternalModalAttrs> {
       if (app.session.user && String(app.colorScheme) !== this.savedScheme) {
         await app.session.user.savePreferences({ colorScheme: app.colorScheme });
       } else if (!app.session.user) {
-        try {
-          sessionStorage.setItem('colorScheme', String(app.colorScheme));
-        } catch (e) {
-          // Storage blocked: the scheme lasts for this page only.
-        }
+        // Where core keeps a guest's scheme.
+        storage((local, session) => session.setItem('colorScheme', String(app.colorScheme)), undefined);
       }
       this.done = true;
       this.hide();

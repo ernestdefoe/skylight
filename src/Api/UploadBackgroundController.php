@@ -11,7 +11,6 @@ namespace ErnestDefoe\Skylight\Api;
 
 use ErnestDefoe\Skylight\Backgrounds;
 use Flarum\Api\Controller\UploadImageController;
-use Flarum\Foundation\ValidationException;
 use Illuminate\Support\Arr;
 use Intervention\Image\Interfaces\EncodedImageInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -41,14 +40,9 @@ class UploadBackgroundController extends UploadImageController
         return Backgrounds::key(self::slot($request));
     }
 
+    /** img1–img4: extend.php's route pattern lets nothing else through. */
     public static function slot(ServerRequestInterface $request): string
     {
-        $slot = (string) Arr::get((array) $request->getAttribute('routeParameters'), 'slot');
-
-        if (! in_array($slot, Backgrounds::SLOTS, true)) {
-            throw new ValidationException(['slot' => 'Unknown background slot.']);
-        }
-
-        return $slot;
+        return (string) Arr::get((array) $request->getAttribute('routeParameters'), 'slot');
     }
 }

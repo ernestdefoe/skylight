@@ -85,6 +85,7 @@ ernestdefoe-skylight:
         label: Share your look
         copy: Copy
         copied: Your look's code is copied.
+        copy_failed: Your browser didn't allow copying. Select the code and copy it yourself.
         paste_label: Paste someone's look code
         apply: Use
         invalid: That isn't a look code. They start with SKY- and look like SKY-127C86000000E200.

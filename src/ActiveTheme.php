@@ -9,7 +9,8 @@
 
 namespace ErnestDefoe\Skylight;
 
-use Flarum\Extension\ExtensionManager;
+use ErnestDefoe\Skylight\Integration\BespokeProvider;
+use ErnestDefoe\Skylight\Integration\WardrobeProvider;
 use Flarum\Http\RequestUtil;
 use Illuminate\Contracts\Container\Container;
 use Psr\Http\Message\ServerRequestInterface;
@@ -26,26 +27,23 @@ use Psr\Log\LoggerInterface;
  *   fight; the admin page says to offer Skylight through Wardrobe instead.
  * - Otherwise: yes.
  *
- * 🚨 Soft: Wardrobe is never required and its classes are named as strings.
+ * Both integrations are bound by Extend\Conditional in extend.php
+ * (Integration\*Provider), so this class never names either extension.
  */
 final class ActiveTheme
 {
     public const ID = 'ernestdefoe-skylight';
 
-    private const REGISTRY = 'Ernestdefoe\\Wardrobe\\ThemeRegistry';
-
-    /** @var \WeakMap<ServerRequestInterface, bool>|null */
+    /** @var \WeakMap<ServerRequestInterface, bool>|null One answer per request: entries go with their request. */
     private static ?\WeakMap $answers = null;
 
-    private static bool $logged = false;
-
-    public function __construct(protected ExtensionManager $extensions, protected Container $container, protected LoggerInterface $logger)
+    public function __construct(protected Container $container, protected LoggerInterface $logger)
     {
     }
 
     public function blockedByBespoke(): bool
     {
-        return $this->extensions->isEnabled('ernestdefoe-bespoke') && ! $this->wardrobe();
+        return $this->container->bound(BespokeProvider::BINDING) && ! $this->container->bound(WardrobeProvider::BINDING);
     }
 
     public function for(?ServerRequestInterface $request): bool
@@ -54,7 +52,7 @@ final class ActiveTheme
             return false;
         }
 
-        if (! $request || ! $this->wardrobe()) {
+        if (! $request || ! $this->container->bound(WardrobeProvider::BINDING)) {
             return true;
         }
 
@@ -63,27 +61,20 @@ final class ActiveTheme
         return self::$answers[$request] ??= $this->ask($request);
     }
 
-    private function wardrobe(): bool
-    {
-        return $this->extensions->isEnabled('ernestdefoe-wardrobe') && class_exists(self::REGISTRY);
-    }
-
     private function ask(ServerRequestInterface $request): bool
     {
         try {
             $cookie = $request->getCookieParams()['wardrobe_theme'] ?? null;
-            $chosen = $this->container->make(self::REGISTRY)->resolve(RequestUtil::getActor($request), is_string($cookie) ? $cookie : null);
+            $chosen = ($this->container->make(WardrobeProvider::BINDING))(RequestUtil::getActor($request), is_string($cookie) ? $cookie : null);
         } catch (\Throwable $e) {
-            if (! self::$logged) {
-                self::$logged = true;
-                $this->logger->warning('Skylight: Wardrobe could not resolve the visitor\'s theme, so Skylight serves as the only theme: '.$e->getMessage(), ['exception' => $e]);
-            }
+            // Wardrobe could not say: Skylight serves as the only theme, which is what the visitor saw before Wardrobe.
+            $this->logger->warning('Skylight: Wardrobe could not resolve the visitor\'s theme: '.$e->getMessage(), ['exception' => $e]);
 
             return true;
         }
 
         // null: Wardrobe serves the shared stylesheet with every enabled theme
         // in it. Skylight then styles the page only when Bespoke is not there too.
-        return $chosen === self::ID || ($chosen === null && ! $this->extensions->isEnabled('ernestdefoe-bespoke'));
+        return $chosen === self::ID || ($chosen === null && ! $this->container->bound(BespokeProvider::BINDING));
     }
 }

@@ -1,5 +1,6 @@
 import app from 'flarum/forum/app';
 import { attributes, effective, Look, sanitize, stamp } from '../common/look';
+import { parseJson, storage } from '../common/safe';
 
 /**
  * The visitor's own Studio choices: user.preferences.skylight for a member,
@@ -12,11 +13,7 @@ export function own(): Partial<Look> {
   const user = app.session.user;
   if (user) return sanitize(user.preferences()?.skylight);
 
-  try {
-    return sanitize(JSON.parse(localStorage.getItem(KEY) || 'null')?.look);
-  } catch (e) {
-    return {};
-  }
+  return sanitize(parseJson<{ look?: unknown } | null>(storage((local) => local.getItem(KEY), null), null)?.look);
 }
 
 /** Put the visitor's look on the page (also the Studio's live preview). */
@@ -35,15 +32,12 @@ export async function save(choices: Partial<Look>): Promise<void> {
     return;
   }
 
-  try {
-    if (!Object.keys(clean).length) {
-      localStorage.removeItem(KEY);
-    } else {
-      const { a, s } = attributes(effective(clean));
-      if ('glass' in clean) a['data-sky-glass-set'] = '1';
-      localStorage.setItem(KEY, JSON.stringify({ look: clean, a, s }));
-    }
-  } catch (e) {
-    // Storage blocked (private window): the look lasts for this page only.
+  if (!Object.keys(clean).length) {
+    storage((local) => local.removeItem(KEY), undefined);
+    return;
   }
+
+  const { a, s } = attributes(effective(clean));
+  if ('glass' in clean) a['data-sky-glass-set'] = '1';
+  storage((local) => local.setItem(KEY, JSON.stringify({ look: clean, a, s })), undefined);
 }

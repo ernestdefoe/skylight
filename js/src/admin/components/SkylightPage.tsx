@@ -8,91 +8,39 @@ import type Mithril from 'mithril';
 import LookControls from '../../common/components/LookControls';
 import { accents, contrast } from '../../common/color';
 import { BUILT_IN, hexList, Look, LookKey, payload, sanitize, SECTIONS } from '../../common/look';
+import { parseJson } from '../../common/safe';
 
 const t = (key: string, params?: any) => app.translator.trans(`ernestdefoe-skylight.admin.${key}`, params);
 const SLOTS = ['img1', 'img2', 'img3', 'img4'];
+const KEYS = {
+  defaults: 'ernestdefoe-skylight.defaults',
+  sections: 'ernestdefoe-skylight.sections',
+  presets: 'ernestdefoe-skylight.presets',
+};
 
 /**
  * Skylight's settings: the forum's defaults (the same controls members get
- * in their Studio), which Studio sections members may use, the extra accent
+ * with Personalize), which sections members may change, the extra accent
  * presets, the backgrounds and the two switches.
  */
 export default class SkylightPage extends ExtensionPage {
   content(vnode: Mithril.VnodeDOM<any, this>) {
-    const defaults = this.defaults();
-    const sections = this.openSections();
-    const p = payload();
-
     return (
       <div className="ExtensionPage-settings SkylightAdmin">
         <div className="container">
-          {p.blockedByBespoke && (
+          {payload().blockedByBespoke && (
             <Alert type="warning" dismissible={false} className="SkylightAdmin-alert">
               {t('bespoke_notice')}
             </Alert>
           )}
           <Form>
             <div className="SkylightAdmin-grid">
-              <section className="SkylightAdmin-card">
-                <h3>{t('defaults.title')}</h3>
-                <p className="helpText">{t('defaults.help')}</p>
-                <LookControls
-                  look={defaults}
-                  sections={Object.keys(SECTIONS)}
-                  readability={false}
-                  presets={hexList(this.setting('ernestdefoe-skylight.presets')())}
-                  backgrounds={p.backgrounds}
-                  onchange={(key: LookKey, value: any) => this.setDefault(key, value)}
-                />
-                {this.contrastReadout(defaults)}
-              </section>
-
+              {this.defaultsCard()}
               <div className="SkylightAdmin-column">
-                <section className="SkylightAdmin-card">
-                  <h3>{t('studio.title')}</h3>
-                  <p className="helpText">{t('studio.help')}</p>
-                  <div className="SkylightAdmin-checks">
-                    {Object.keys(SECTIONS).map((section) => (
-                      <Switch state={sections.includes(section)} onchange={(on: boolean) => this.toggleSection(section, on)}>
-                        {app.translator.trans(`ernestdefoe-skylight.lib.sections.${section}`)}
-                      </Switch>
-                    ))}
-                  </div>
-                  <p className="helpText">{t('studio.readability_always')}</p>
-                  <p className="helpText">{t('studio.permission')}</p>
-                </section>
-
-                <section className="SkylightAdmin-card">
-                  <h3>{t('presets.title')}</h3>
-                  <p className="helpText">{t('presets.help')}</p>
-                  <input
-                    className="FormControl"
-                    placeholder="#1f8a6f, #9a4fb0"
-                    value={hexList(this.setting('ernestdefoe-skylight.presets')()).join(', ')}
-                    onchange={(e: Event) => this.setting('ernestdefoe-skylight.presets')(JSON.stringify(hexList((e.target as HTMLInputElement).value).slice(0, 6)))}
-                  />
-                </section>
-
-                <section className="SkylightAdmin-card">
-                  <h3>{t('backgrounds.title')}</h3>
-                  <p className="helpText">{t('backgrounds.help')}</p>
-                  <div className="SkylightAdmin-uploads">
-                    {SLOTS.map((slot) => (
-                      <UploadImageButton
-                        name="skylight-bg"
-                        routePath={`skylight/backgrounds/${slot}`}
-                        value={app.data.settings[`ernestdefoe-skylight.bg_${slot}`]}
-                        url={p.backgrounds[slot]}
-                      />
-                    ))}
-                  </div>
-                </section>
-
-                <section className="SkylightAdmin-card">
-                  <h3>{t('more.title')}</h3>
-                  {this.switch('ernestdefoe-skylight.tag_accent', 'more.tag_accent')}
-                  {this.switch('ernestdefoe-skylight.auto_solid', 'more.auto_solid')}
-                </section>
+                {this.sectionsCard()}
+                {this.presetsCard()}
+                {this.backgroundsCard()}
+                {this.card('more.title', null, [this.switch('ernestdefoe-skylight.tag_accent', 'more.tag_accent'), this.switch('ernestdefoe-skylight.auto_solid', 'more.auto_solid')])}
               </div>
             </div>
             <div className="Form-group Form-controls">{this.submitButton()}</div>
@@ -102,12 +50,88 @@ export default class SkylightPage extends ExtensionPage {
     );
   }
 
+  card(title: string, help: string | null, body: Mithril.Children) {
+    return (
+      <section className="SkylightAdmin-card">
+        <h3>{t(title)}</h3>
+        {help && <p className="helpText">{t(help)}</p>}
+        {body}
+      </section>
+    );
+  }
+
+  defaultsCard() {
+    const defaults = this.defaults();
+
+    return this.card('defaults.title', 'defaults.help', [
+      <LookControls
+        look={defaults}
+        sections={Object.keys(SECTIONS)}
+        readability={false}
+        presets={hexList(this.setting(KEYS.presets)())}
+        backgrounds={payload().backgrounds}
+        onchange={(key: LookKey, value: any) => this.setDefault(key, value)}
+      />,
+      this.contrastReadout(defaults),
+    ]);
+  }
+
+  sectionsCard() {
+    const open = this.openSections();
+
+    return this.card('studio.title', 'studio.help', [
+      <div className="SkylightAdmin-checks">
+        {Object.keys(SECTIONS).map((section) => (
+          <Switch state={open.includes(section)} onchange={(on: boolean) => this.toggleSection(section, on)}>
+            {app.translator.trans(`ernestdefoe-skylight.lib.sections.${section}`)}
+          </Switch>
+        ))}
+      </div>,
+      <p className="helpText">{t('studio.readability_always')}</p>,
+      <p className="helpText">{t('studio.permission')}</p>,
+    ]);
+  }
+
+  presetsCard() {
+    const presets = this.setting(KEYS.presets);
+
+    return this.card(
+      'presets.title',
+      'presets.help',
+      <input
+        className="FormControl"
+        placeholder="#1f8a6f, #9a4fb0"
+        value={hexList(presets()).join(', ')}
+        onchange={(e: Event) => presets(JSON.stringify(hexList((e.target as HTMLInputElement).value).slice(0, 6)))}
+      />
+    );
+  }
+
+  backgroundsCard() {
+    const urls = payload().backgrounds;
+
+    return this.card(
+      'backgrounds.title',
+      'backgrounds.help',
+      <div className="SkylightAdmin-uploads">
+        {SLOTS.map((slot) => (
+          <UploadImageButton
+            name="skylight-bg"
+            routePath={`skylight/backgrounds/${slot}`}
+            value={app.data.settings[`ernestdefoe-skylight.bg_${slot}`]}
+            url={urls[slot]}
+          />
+        ))}
+      </div>
+    );
+  }
+
   switch(key: string, label: string) {
     const value = this.setting(key);
     return (
       <Switch state={!!Number(value()) || value() === 'true'} onchange={(on: boolean) => value(on ? '1' : '0')}>
         <span>
-          {t(`${label}`)}
+          {t(label)}
           <small className="helpText">{t(`${label}_help`)}</small>
         </span>
       </Switch>
@@ -115,37 +139,25 @@ export default class SkylightPage extends ExtensionPage {
   }
 
   defaults(): Look {
-    let stored: any = {};
-    try {
-      stored = JSON.parse(this.setting('ernestdefoe-skylight.defaults')() || '{}');
-    } catch (e) {
-      stored = {};
-    }
-    return { ...BUILT_IN, ...sanitize(stored) };
+    return { ...BUILT_IN, ...sanitize(parseJson(this.setting(KEYS.defaults)(), {})) };
   }
 
   setDefault(key: LookKey, value: any) {
-    const look = { ...this.defaults(), [key]: value };
     // Store only what differs from the built-in look.
-    const diff: any = {};
-    for (const [k, v] of Object.entries(sanitize(look))) if ((BUILT_IN as any)[k] !== v) diff[k] = v;
-    this.setting('ernestdefoe-skylight.defaults')(JSON.stringify(diff));
+    const diff: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(sanitize({ ...this.defaults(), [key]: value }))) if ((BUILT_IN as any)[k] !== v) diff[k] = v;
+    this.setting(KEYS.defaults)(JSON.stringify(diff));
   }
 
   openSections(): string[] {
-    const raw = this.setting('ernestdefoe-skylight.sections')();
-    try {
-      const list = raw ? JSON.parse(raw) : null;
-      return Array.isArray(list) ? list : Object.keys(SECTIONS);
-    } catch (e) {
-      return Object.keys(SECTIONS);
-    }
+    const list = parseJson<unknown>(this.setting(KEYS.sections)(), null);
+    return Array.isArray(list) ? list : Object.keys(SECTIONS);
   }
 
   toggleSection(section: string, on: boolean) {
     const list = this.openSections().filter((s) => s !== section);
     if (on) list.push(section);
-    this.setting('ernestdefoe-skylight.sections')(JSON.stringify(Object.keys(SECTIONS).filter((s) => list.includes(s))));
+    this.setting(KEYS.sections)(JSON.stringify(Object.keys(SECTIONS).filter((s) => list.includes(s))));
   }
 
   contrastReadout(look: Look) {

@@ -34,9 +34,6 @@ class DiscussionFields
 {
     public const LENGTH = 160;
 
-    /** @var \WeakMap<object, bool>|null per request */
-    private static ?\WeakMap $answers = null;
-
     public function __construct(protected Look $look, protected ActiveTheme $theme)
     {
     }
@@ -78,9 +75,7 @@ class DiscussionFields
 
     public function wanted(Context $context): bool
     {
-        self::$answers ??= new \WeakMap();
-
-        return self::$answers[$context->request] ??= (($context->request->getQueryParams()['filter'] ?? [])['skylight'] ?? null) === 'cards'
+        return (($context->request->getQueryParams()['filter'] ?? [])['skylight'] ?? null) === 'cards'
             || ($this->theme->for($context->request) && $this->look->for($context->getActor())['look']['view'] === 'cards');
     }
 }

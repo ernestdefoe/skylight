@@ -1,0 +1,80 @@
+{
+    "name": "ernestdefoe/skylight",
+    "description": "Skylight: a calm glass-and-daylight theme for Flarum 2, with a Studio where each member picks their own accent, background, glass, text size and list view.",
+    "type": "flarum-extension",
+    "keywords": [
+        "flarum",
+        "flarum-extension",
+        "theme",
+        "glass",
+        "glassmorphism",
+        "personalization",
+        "dark-mode",
+        "accessibility"
+    ],
+    "homepage": "https://github.com/ernestdefoe/skylight",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ernestdefoe",
+            "email": "ernestdefoe@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.3",
+        "flarum/core": "^2.0"
+    },
+    "suggest": {
+        "flarum/tags": "Inside a tag, the page takes the tag's color, and cards show it along their top edge.",
+        "ernestdefoe/wardrobe": "Offer Skylight beside other themes, chosen by each member and guest."
+    },
+    "autoload": {
+        "psr-4": {
+            "ErnestDefoe\\Skylight\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ErnestDefoe\\Skylight\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "flarum-extension": {
+            "title": "Skylight",
+            "category": "theme",
+            "icon": {
+                "name": "fas fa-sun",
+                "backgroundColor": "#127C86",
+                "color": "#FFF6E8"
+            },
+            "optional-dependencies": [
+                "flarum/tags",
+                "ernestdefoe/wardrobe"
+            ]
+        }
+    },
+    "support": {
+        "issues": "https://github.com/ernestdefoe/skylight/issues",
+        "source": "https://github.com/ernestdefoe/skylight"
+    },
+    "require-dev": {
+        "flarum/phpstan": "^2.0",
+        "flarum/tags": "^2.0",
+        "flarum/testing": "^2.0",
+        "laravel/pint": "^1.32"
+    },
+    "scripts": {
+        "test": [
+            "@test:unit"
+        ],
+        "test:unit": "phpunit -c tests/phpunit.unit.xml",
+        "analyse:phpstan": "phpstan analyse",
+        "style": "pint --test",
+        "style:fix": "pint"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "beta",
+    "prefer-stable": true
+}

@@ -19,6 +19,11 @@
   html[data-sky] .DiscussionListItem-title {
     white-space: normal;
   }
+  // Core's unread bubble: the accent with its own readable ink (core's #fff
+  // fails on light accents, and the list's muted stats color would win here).
+  html[data-sky] .unread .DiscussionListItem-count {
+    color: var(--button-primary-color);
+  }
 
   // Cards: one column.
   html[data-sky][data-sky-view="cards"] .DiscussionList > .DiscussionList-discussions {

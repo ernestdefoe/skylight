@@ -97,10 +97,19 @@ html[data-sky][data-sky-view="cards"] .DiscussionListItem-info {
     position: static;
     max-width: none;
     margin: 0 0 8px;
-    // Clear of the card's menu button in the top-right corner.
+    // Clear of the card's menu button in the top-right corner; every tag
+    // shows, wrapping onto a second line when they don't fit.
     padding-right: 30px;
+    white-space: normal;
+    overflow: visible;
     -webkit-mask-image: none;
     mask-image: none;
+
+    .TagsLabel {
+      display: inline-flex;
+      flex-wrap: wrap;
+      row-gap: 4px;
+    }
   }
   .item-skylightExcerpt {
     order: 3;
@@ -205,7 +214,8 @@ html[data-sky][data-sky-view="compact"] .DiscussionListItem-info {
   white-space: nowrap;
 
   .item-terminalPost,
-  .item-excerpt { display: none; }
+  .item-excerpt,
+  .item-skylightExcerpt { display: none; }
 
   // flarum/tags floats the tags over the row; here they sit in the line,
   // after the title, so a long title stops short of them.

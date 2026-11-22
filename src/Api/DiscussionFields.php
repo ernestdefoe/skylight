@@ -16,6 +16,7 @@ use Flarum\Api\Resource\EloquentBuffer;
 use Flarum\Api\Schema;
 use Flarum\Discussion\Discussion;
 use Flarum\Post\CommentPost;
+use Flarum\Settings\SettingsRepositoryInterface;
 use s9e\TextFormatter\Utils;
 
 /**
@@ -34,7 +35,7 @@ class DiscussionFields
 {
     public const LENGTH = 160;
 
-    public function __construct(protected Look $look, protected ActiveTheme $theme)
+    public function __construct(protected Look $look, protected ActiveTheme $theme, protected SettingsRepositoryInterface $settings)
     {
     }
 
@@ -43,7 +44,7 @@ class DiscussionFields
         return [
             Schema\Str::make('skylightExcerpt')
                 ->nullable()
-                ->visible(fn (Discussion $discussion, Context $context) => $this->wanted($context))
+                ->visible(fn (Discussion $discussion, Context $context) => $this->wanted($context) || $this->replacesStickyExcerpt($discussion, $context))
                 ->get(function (Discussion $discussion, Context $context) {
                     if (! $discussion->relationLoaded('firstPost')) {
                         EloquentBuffer::add($discussion, 'firstPost');
@@ -82,6 +83,20 @@ class DiscussionFields
         $xml = preg_replace('#<br/>|</(p|LI|QUOTE|CODE|H[1-6]|SPOILER|DETAILS|TD|TH)>#i', '$0 ', $xml) ?? $xml;
 
         return trim(preg_replace('/\s+/u', ' ', Utils::removeFormatting($xml)) ?? '');
+    }
+
+    /**
+     * flarum/sticky shows its own excerpt on sticky rows, built with
+     * removeFormatting alone (paragraphs run together, image alt text shows).
+     * While Skylight styles the page it sends its own text for those rows and
+     * shows it in their place (less/forum/list.less). Same relation buffer as
+     * sticky's, so no extra query.
+     */
+    public function replacesStickyExcerpt(Discussion $discussion, Context $context): bool
+    {
+        return $discussion->getAttribute('is_sticky')
+            && $this->settings->get('flarum-sticky.enable_display_excerpt')
+            && $this->theme->for($context->request);
     }
 
     public function wanted(Context $context): bool

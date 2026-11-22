@@ -28,7 +28,8 @@
         "flarum/tags": "Inside a tag, the page takes the tag's color, and cards show it along their top edge.",
         "ernestdefoe/wardrobe": "Offer Skylight beside other themes, chosen by each member and guest.",
         "ernestdefoe/bespoke": "Skylight stays off while Bespoke styles the forum, unless Wardrobe lets each member pick their theme.",
-        "fof/discussion-views": "Skylight shows its view count beside the reply count in every list view."
+        "fof/discussion-views": "Skylight shows its view count beside the reply count in every list view.",
+        "flarum/sticky": "Sticky discussions' excerpts in the list use Skylight's cleaner text."
     },
     "autoload": {
         "psr-4": {
@@ -53,7 +54,8 @@
                 "flarum/tags",
                 "ernestdefoe/wardrobe",
                 "ernestdefoe/bespoke",
-                "fof/discussion-views"
+                "fof/discussion-views",
+                "flarum/sticky"
             ]
         }
     },

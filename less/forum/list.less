@@ -105,9 +105,23 @@ html[data-sky] .DiscussionListItem-content:has(.Skylight-views) {
   }
 }
 
-// The excerpt only shows on Cards (it is only sent then, too).
+// Skylight's excerpt is sent for Cards, and for sticky rows, where it takes
+// the place of flarum/sticky's (src/Api/DiscussionFields.php says why).
 html[data-sky] .DiscussionListItem-info .item-skylightExcerpt {
   display: none;
+}
+html[data-sky] .DiscussionListItem-info:has(> .item-excerpt) {
+  > .item-skylightExcerpt {
+    display: block;
+    margin-top: 4px;
+    white-space: normal;
+    word-break: break-word;
+    font-size: 12px;
+    line-height: 1.5em;
+  }
+  > .item-excerpt {
+    display: none;
+  }
 }
 
 html[data-sky] .DiscussionList-loadMore {

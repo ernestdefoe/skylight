@@ -113,17 +113,19 @@ html[data-sky] .WelcomeHero .Hero-close {
     margin-bottom: 10px;
   }
 }
-// Tablets: core lays the nav out as one scrolling row. The pane is that row:
-// it scrolls inside itself (so its glass reaches the last link), as tall as
-// its buttons, and the links' own menu stays clear (no second glass layer inside it).
-@media @tablet {
-  html[data-sky] .sideNav {
-    padding: 12px 0;
+// Core lays the nav out as one scrolling row on tablets, and on every width on
+// "vertical" pages such as Tags. The pane is that row: it scrolls inside itself
+// (so its glass reaches the last link), as tall as its buttons, and the links'
+// own menu stays clear (no second glass layer inside it).
+.sky-nav-row() {
+  .sideNav {
+    // Core already keeps 15px between the nav and the page below it.
+    padding: 12px 0 0;
     overflow: visible;
 
     &::after { display: none; }
   }
-  html[data-sky] .sideNav > ul {
+  .sideNav > ul {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -133,7 +135,7 @@ html[data-sky] .WelcomeHero .Hero-close {
 
     > li { margin: 0; flex: none; }
   }
-  html[data-sky] .sideNav .Dropdown-menu {
+  .sideNav .Dropdown-menu {
     background: transparent;
     box-shadow: none;
     -webkit-backdrop-filter: none;
@@ -145,6 +147,12 @@ html[data-sky] .WelcomeHero .Hero-close {
     // Core trims the links' right padding in a row; the active pill needs it.
     > li > a { padding-right: 10px; }
   }
+}
+@media @tablet {
+  html[data-sky] { .sky-nav-row(); }
+}
+@media @desktop-up {
+  html[data-sky] .Page--vertical { .sky-nav-row(); }
 }
 html[data-sky] .sideNav .Dropdown-menu > li > a,
 html[data-sky] .sideNav .Dropdown-menu > li > button {

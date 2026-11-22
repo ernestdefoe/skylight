@@ -184,6 +184,12 @@ html[data-sky][data-sky-view="compact"] .DiscussionListItem-content {
   padding: 7px 12px;
   gap: 10px;
 }
+// The row's menu button, centered in the short row (core pins it near the
+// top of a taller one, so here it hung below the row's edge).
+html[data-sky][data-sky-view="compact"] .DiscussionListItem-controls {
+  top: 50%;
+  margin-top: -18px;
+}
 html[data-sky][data-sky-view="compact"] .DiscussionListItem-author .Avatar {
   --size: 24px;
   width: 24px;

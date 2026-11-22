@@ -94,6 +94,7 @@ ernestdefoe-skylight:
       list: List
       cards: Cards
       compact: Compact
+      view_count: "{count, plural, one {# view} other {# views}}"
 
   admin:
     bespoke_notice: Bespoke is styling this forum, so Skylight stays off. To offer both, install Wardrobe and let members pick their theme.

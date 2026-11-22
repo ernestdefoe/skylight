@@ -23,7 +23,6 @@ html[data-sky][data-sky-view="cards"] .DiscussionList > .DiscussionList-discussi
 }
 html[data-sky][data-sky-view="cards"] .DiscussionListItem {
   .sky-pane();
-  overflow: hidden;
   padding: 0;
   flex: 1;
   min-width: 0;
@@ -39,6 +38,8 @@ html[data-sky][data-sky-view="cards"] .DiscussionListItem {
     right: 0;
     top: 0;
     height: 3px;
+    // Rounded to the card's corners (the card can't clip: its menu opens past it).
+    border-radius: var(--sky-radius) var(--sky-radius) 0 0;
     background: linear-gradient(90deg, var(--sky-tag, var(--primary-color)), ~"color-mix(in srgb, var(--sky-tag, var(--primary-color)) 10%, transparent)");
     pointer-events: none;
   }
@@ -52,12 +53,16 @@ html[data-sky][data-sky-view="cards"] .DiscussionListItem {
     right: 8px;
     z-index: 2;
   }
+  // An open menu stays above the cards after this one.
+  &:has(.Dropdown.open) {
+    z-index: 5;
+  }
 }
 html[data-sky][data-sky-view="cards"] .DiscussionListItem-content {
   flex: 1;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  grid-template-areas: "main main main" "author who stats";
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: "main main" "author stats";
   align-items: center;
   gap: 12px 10px;
   padding: 16px 16px 14px;
@@ -92,6 +97,8 @@ html[data-sky][data-sky-view="cards"] .DiscussionListItem-info {
     position: static;
     max-width: none;
     margin: 0 0 8px;
+    // Clear of the card's menu button in the top-right corner.
+    padding-right: 30px;
     -webkit-mask-image: none;
     mask-image: none;
   }
@@ -106,29 +113,55 @@ html[data-sky][data-sky-view="cards"] .DiscussionListItem-info {
     font-size: 1.15em;
     line-height: 1.5;
   }
-  // Who replied: moved to the card's foot, beside the avatar.
-  .item-terminalPost {
-    order: 4;
-    position: absolute;
-    left: 50px;
-    right: 64px;
-    bottom: 18px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  // Core's sticky excerpt repeats the card's own excerpt.
+  &:has(.item-skylightExcerpt) > .item-excerpt {
+    display: none;
   }
 }
 html[data-sky][data-sky-view="cards"] .DiscussionListItem-author {
   grid-area: author;
+  position: relative;
   .Avatar { --size: 26px; width: 26px; height: 26px; font-size: 11px; line-height: 26px; }
 }
+// Badges (sticky, locked…): small, on the avatar's top-left corner.
 html[data-sky][data-sky-view="cards"] .DiscussionListItem-badges {
-  position: static;
+  position: absolute;
+  top: -7px;
+  left: -7px;
+  width: auto;
   margin: 0;
+  display: flex;
+
+  .Badge {
+    --size: 16px;
+    font-size: 8px;
+    margin: 0 -4px 0 0;
+  }
 }
+// The card's foot: who replied, then the counts.
 html[data-sky][data-sky-view="cards"] .DiscussionListItem-stats {
   grid-area: stats;
+  position: static;
   width: auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+
+  > .DiscussionListItem-stats-item {
+    flex: none;
+    min-width: 0;
+  }
+}
+html[data-sky][data-sky-view="cards"] .Skylight-who {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.85em;
+  color: var(--muted-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 html[data-sky][data-sky-view="cards"] .DiscussionListItem-content {
   min-height: 150px;
@@ -171,5 +204,14 @@ html[data-sky][data-sky-view="compact"] .DiscussionListItem-info {
   flex: none;
   white-space: nowrap;
 
-  .item-terminalPost { display: none; }
+  .item-terminalPost,
+  .item-excerpt { display: none; }
+
+  // flarum/tags floats the tags over the row; here they sit in the line,
+  // after the title, so a long title stops short of them.
+  > .item-tags {
+    position: static;
+    display: inline-block;
+    vertical-align: middle;
+  }
 }

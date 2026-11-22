@@ -65,12 +65,23 @@ class DiscussionFields
                             return null;
                         }
 
-                        $plain = trim(preg_replace('/\s+/', ' ', Utils::removeFormatting($post->parsed_content)) ?? '');
-
-                        return mb_substr($plain, 0, self::LENGTH);
+                        return mb_substr(self::plain($post->parsed_content), 0, self::LENGTH);
                     };
                 }),
         ];
+    }
+
+    /**
+     * A post's text on one line. Images (their alt text) are dropped, and
+     * paragraphs, line breaks and other blocks become spaces, so "a</p><p>b"
+     * reads "a b", not "ab".
+     */
+    public static function plain(string $xml): string
+    {
+        $xml = preg_replace('#<(IMG|UPL-IMAGE-PREVIEW)\b[^>]*/>|<(IMG|UPL-IMAGE-PREVIEW)\b.*?</\2>#s', ' ', $xml) ?? $xml;
+        $xml = preg_replace('#<br/>|</(p|LI|QUOTE|CODE|H[1-6]|SPOILER|DETAILS|TD|TH)>#i', '$0 ', $xml) ?? $xml;
+
+        return trim(preg_replace('/\s+/u', ' ', Utils::removeFormatting($xml)) ?? '');
     }
 
     public function wanted(Context $context): bool

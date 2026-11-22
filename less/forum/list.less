@@ -21,7 +21,12 @@ html[data-sky] .DiscussionList-discussions:empty {
 html[data-sky] .DiscussionListItem {
   border-radius: var(--sky-radius-sm);
   margin: 0;
-  padding-right: 28px;
+}
+// Room for the row's controls; on phones they slide out from under the row.
+@media @tablet-up {
+  html[data-sky] .DiscussionListItem {
+    padding-right: 28px;
+  }
 }
 html[data-sky] .DiscussionList-discussions > li + li {
   border-top: 1px solid var(--sky-hairline);
@@ -55,6 +60,42 @@ html[data-sky] .DiscussionListItem-info {
 }
 html[data-sky] .DiscussionListItem-stats-item {
   color: var(--muted-color);
+}
+
+// Counts sit side by side in their own column (core stacks them in a 40px
+// column, which a second count such as views overflows).
+@media @tablet-up {
+  html[data-sky] .DiscussionListItem-stats {
+    width: auto;
+    flex: none;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+  html[data-sky] .DiscussionListItem-count {
+    min-width: 42px;
+  }
+  // Wide enough for "999.9K", so the columns line up row to row.
+  html[data-sky] .Skylight-views {
+    min-width: 70px;
+  }
+  // flarum/tags pins the tags 80px from the row's edge, which fits one 40px
+  // count; with views beside it, move them clear of both counts
+  // (28px controls + 12px padding + 42px + 12px gap + 70px + 10px).
+  html[data-sky] .DiscussionListItem:has(.Skylight-views) .DiscussionListItem-info > .item-tags {
+    right: 174px;
+  }
+}
+
+// fof/discussion-views: its count becomes a stat (forum/listViews.tsx), so
+// hide the copy it pins over the row's edge and give back the room it keeps.
+html[data-sky] .DiscussionListItem-content:has(.Skylight-views) {
+  .DiscussionListItem-main {
+    margin-right: 0;
+  }
+  .DiscussionListItem-info > .item-discussion-views {
+    display: none;
+  }
 }
 // Desktop only: on phones core shows the unread count in an accent bubble.
 @media @tablet-up {

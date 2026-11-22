@@ -19,6 +19,24 @@
   html[data-sky] .DiscussionListItem-title {
     white-space: normal;
   }
+  // The counts: one centered column at the row's right edge (the reply count,
+  // and Skylight's views stat when fof/discussion-views is on; see forum/listViews.tsx).
+  html[data-sky] .DiscussionListItem-stats {
+    top: var(--sky-row-y);
+    right: 8px;
+    width: 52px;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  html[data-sky] .DiscussionListItem-main {
+    padding-right: 56px;
+  }
+  html[data-sky] .Skylight-views {
+    font-size: 11px;
+    gap: 3px;
+    white-space: nowrap;
+  }
   // Core's unread bubble: the accent with its own readable ink (core's #fff
   // fails on light accents, and the list's muted stats color would win here).
   html[data-sky] .unread .DiscussionListItem-count {
@@ -33,6 +51,12 @@
     align-items: center;
     min-height: 0;
   }
+  html[data-sky][data-sky-view="cards"] .DiscussionListItem-main {
+    padding-right: 0;
+  }
+  html[data-sky][data-sky-view="cards"] .Skylight-views {
+    font-size: inherit;
+  }
 
   // Compact: title and count only.
   html[data-sky][data-sky-view="compact"] .DiscussionListItem-content {
@@ -40,6 +64,21 @@
   }
   html[data-sky][data-sky-view="compact"] .DiscussionListItem-info {
     display: none;
+  }
+  // One short line: the counts sit in it, side by side.
+  html[data-sky][data-sky-view="compact"] .DiscussionListItem-stats {
+    position: static;
+    width: auto;
+    flex: none;
+    flex-direction: row;
+    gap: 8px;
+  }
+  html[data-sky][data-sky-view="compact"] .DiscussionListItem-main {
+    padding-right: 0;
+  }
+  // A fixed width, so the reply counts line up row to row.
+  html[data-sky][data-sky-view="compact"] .Skylight-views {
+    min-width: 52px;
   }
 
   // Posts: panes with an even gutter on both sides.

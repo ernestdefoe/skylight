@@ -107,8 +107,43 @@ html[data-sky] .WelcomeHero .Hero-close {
     .sky-blur();
     padding: 12px;
   }
+}
+@media @desktop-up {
   html[data-sky] .sideNav .item-newDiscussion {
     margin-bottom: 10px;
+  }
+}
+// Tablets: core lays the nav out as one scrolling row. The pane is that row:
+// it scrolls inside itself (so its glass reaches the last link), as tall as
+// its buttons, and the links' own menu stays clear (no second glass layer inside it).
+@media @tablet {
+  html[data-sky] .sideNav {
+    padding: 12px 0;
+    overflow: visible;
+
+    &::after { display: none; }
+  }
+  html[data-sky] .sideNav > ul {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+
+    > li { margin: 0; flex: none; }
+  }
+  html[data-sky] .sideNav .Dropdown-menu {
+    background: transparent;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+
+    // Core trims the links' right padding in a row; the active pill needs it.
+    > li > a { padding-right: 10px; }
   }
 }
 html[data-sky] .sideNav .Dropdown-menu > li > a,

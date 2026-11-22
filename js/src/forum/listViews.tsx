@@ -2,6 +2,9 @@ import app from 'flarum/forum/app';
 import { extend } from 'flarum/common/extend';
 import IndexPage from 'flarum/forum/components/IndexPage';
 import DiscussionListItem from 'flarum/forum/components/DiscussionListItem';
+import TerminalPost from 'flarum/forum/components/TerminalPost';
+import Icon from 'flarum/common/components/Icon';
+import abbreviateNumber from 'flarum/common/utils/abbreviateNumber';
 import DiscussionListState from 'flarum/forum/states/DiscussionListState';
 import Tooltip from 'flarum/common/components/Tooltip';
 import Button from 'flarum/common/components/Button';
@@ -9,6 +12,8 @@ import { payload } from '../common/look';
 import { own, save, show } from './own';
 
 const t = (key: string) => app.translator.trans(`ernestdefoe-skylight.forum.views.${key}`);
+
+const isCards = () => document.documentElement.hasAttribute('data-sky') && currentView() === 'cards';
 
 /** The view on the page right now (the server stamped it; the Studio changes it). */
 export function currentView(): string {
@@ -58,8 +63,7 @@ function viewSwitch(): JSX.Element {
 function extendList() {
   // filter[skylight]=cards asks the API for each discussion's excerpt (one query per page).
   extend(DiscussionListState.prototype, 'requestParams', function (params: any) {
-    if (document.documentElement.hasAttribute('data-sky') && currentView() === 'cards')
-      params.filter = { ...(params.filter || {}), skylight: 'cards' };
+    if (isCards()) params.filter = { ...(params.filter || {}), skylight: 'cards' };
   });
 
   // A guest on Cards: the list preloaded into the page was built without the
@@ -87,6 +91,43 @@ function extendRows() {
   extend(DiscussionListItem.prototype, 'infoItems', function (items) {
     const excerpt = this.attrs.discussion.attribute('skylightExcerpt') as string | null;
     if (excerpt && !this.attrs.params.q) items.add('skylightExcerpt', <span className="Skylight-excerpt">{excerpt}</span>, -110);
+    // Cards show who replied in the card's foot, beside the counts (statsItems below).
+    if (isCards()) items.remove('terminalPost');
+  });
+
+  extend(DiscussionListItem.prototype, 'statsItems', function (items) {
+    if (!document.documentElement.hasAttribute('data-sky')) return;
+    const discussion = this.attrs.discussion;
+
+    // fof/discussion-views pins its count over the row's right edge, where it
+    // collides with the reply count (worse past 100K). Here it is a stat like
+    // the reply count; less/forum/list.less hides fof's own copy while Skylight is on.
+    const views = discussion.attribute('views');
+    if (typeof views === 'number') {
+      // Core's stats-item markup (its component isn't exported to extensions).
+      items.add(
+        'skylightViews',
+        <span className="DiscussionListItem-stats-item Skylight-views">
+          <span className="DiscussionListItem-stats-item-icon">
+            <Icon name="far fa-eye" />
+          </span>
+          <span className="DiscussionListItem-stats-item-label">
+            <span aria-hidden="true">{abbreviateNumber(views)}</span>
+            <span className="visually-hidden">{app.translator.trans('ernestdefoe-skylight.forum.views.view_count', { count: views })}</span>
+          </span>
+        </span>,
+        60
+      );
+    }
+
+    if (isCards())
+      items.add(
+        'skylightWho',
+        <span className="Skylight-who">
+          <TerminalPost discussion={discussion} lastPost={!this.showFirstPost()} />
+        </span>,
+        100
+      );
   });
 }
 

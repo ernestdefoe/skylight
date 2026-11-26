@@ -111,6 +111,30 @@ html[data-sky][data-theme^="dark"] {
   --sky-shadow: 0 1px 2px ~"rgba(0, 0, 0, .3)", 0 10px 30px ~"rgba(0, 0, 0, .35)";
 }
 
+// Night tone "black": the same dark scheme on neutral near-black instead of
+// night blue (Personalize › Background › Night). The accent's dark shade is
+// checked against the blue pane, which is lighter, so it reads here too.
+html[data-sky][data-theme^="dark"][data-sky-night="black"] {
+  --body-bg: #0b0b0c;
+  --body-bg-shaded: #070708;
+  --body-bg-light: #141415;
+  --body-bg-faded: ~"rgba(11, 11, 12, .93)";
+  --text-color: #ececee;
+  --heading-color: #f5f5f6;
+  --muted-color: #a9a9af;
+  --muted-more-color: #909097;
+  --discussion-title-color: #cacacf;
+  --control-color: #d2d2d7;
+  --header-bg: ~"rgba(16, 16, 18, .8)";
+
+  --sky-pane: ~"rgba(24, 24, 26, .84)";
+  --sky-pane-strong: ~"rgba(30, 30, 33, .94)";
+  --sky-pane-solid: #18181a;
+  --sky-pane-border: ~"rgba(255, 255, 255, .07)";
+  --sky-hairline: ~"rgba(255, 255, 255, .08)";
+  --sky-edge: ~"rgba(255, 255, 255, .2)";
+}
+
 // Core's colored header: the header takes the accent, frosted, with text and
 // controls in the accent's own ink (white or near-black, whichever reads).
 html[data-sky][data-colored-header="true"] {

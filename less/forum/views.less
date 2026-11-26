@@ -122,6 +122,12 @@ html[data-sky][data-sky-view="cards"] .DiscussionListItem-info {
     font-size: 1.15em;
     line-height: 1.5;
   }
+  // fof/discussion-thumbnail's picture, full width across the card's top.
+  // object-fit keeps tall and wide pictures to the same band.
+  > .item-skylightThumb {
+    order: 0;
+    margin: -16px -16px 12px;
+  }
   // Core's sticky excerpt repeats the card's own excerpt.
   &:has(.item-skylightExcerpt) > .item-excerpt {
     display: none;
@@ -230,4 +236,29 @@ html[data-sky][data-sky-view="compact"] .DiscussionListItem-info {
     display: inline-block;
     vertical-align: middle;
   }
+}
+// "Below, all shown": in Compact the tags stay in the row, every one of them.
+html[data-sky][data-sky-view="compact"][data-sky-tags="below"] .DiscussionListItem-info > .item-tags {
+  max-width: none;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+// Card pictures (fof/discussion-thumbnail), at the admin's size.
+html[data-sky][data-sky-view="cards"] .Skylight-cardThumb {
+  display: block;
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: var(--sky-radius) var(--sky-radius) 0 0;
+  background: var(--control-bg);
+
+  &--small { height: 96px; }
+  &--large { height: 190px; }
+  &.is-broken { display: none; }
+}
+// The picture replaced the author's avatar (fof's doing); with it on top of
+// the card, the avatar is back in the foot.
+html[data-sky][data-sky-view="cards"] .DiscussionListItem-author:has(.Skylight-authorAvatar) .DiscussionListItem-author-avatar:has(> .DiscussionListItem-thumbnail) {
+  display: none;
 }

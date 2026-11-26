@@ -3,10 +3,12 @@ import ExtensionPage from 'flarum/admin/components/ExtensionPage';
 import Form from 'flarum/common/components/Form';
 import Switch from 'flarum/common/components/Switch';
 import Alert from 'flarum/common/components/Alert';
+import Select from 'flarum/common/components/Select';
+import isExtensionEnabled from 'flarum/admin/utils/isExtensionEnabled';
 import UploadImageButton from 'flarum/common/components/UploadImageButton';
 import type Mithril from 'mithril';
 import LookControls from '../../common/components/LookControls';
-import { accents, contrast } from '../../common/color';
+import { accents, contrast, hex } from '../../common/color';
 import { BUILT_IN, hexList, Look, LookKey, payload, sanitize, SECTIONS } from '../../common/look';
 import { parseJson } from '../../common/safe';
 
@@ -16,7 +18,11 @@ const KEYS = {
   defaults: 'ernestdefoe-skylight.defaults',
   sections: 'ernestdefoe-skylight.sections',
   presets: 'ernestdefoe-skylight.presets',
+  presetsReplace: 'ernestdefoe-skylight.presets_replace',
+  multiTag: 'ernestdefoe-skylight.multi_tag_color',
+  thumbnail: 'ernestdefoe-skylight.card_thumbnail',
 };
+const SIZES = ['off', 'small', 'medium', 'large'];
 
 /**
  * Skylight's settings: the forum's defaults (the same controls members get
@@ -40,8 +46,10 @@ export default class SkylightPage extends ExtensionPage {
                 {this.sectionsCard()}
                 {this.presetsCard()}
                 {this.backgroundsCard()}
+                {isExtensionEnabled('fof-discussion-thumbnail') && this.thumbnailCard()}
                 {this.card('more.title', null, [
                   this.switch('ernestdefoe-skylight.tag_accent', 'more.tag_accent'),
+                  this.multiTagControl(),
                   this.switch('ernestdefoe-skylight.auto_solid', 'more.auto_solid'),
                 ])}
               </div>
@@ -72,6 +80,7 @@ export default class SkylightPage extends ExtensionPage {
         sections={Object.keys(SECTIONS)}
         readability={false}
         presets={hexList(this.setting(KEYS.presets)())}
+        presetsReplace={this.on(KEYS.presetsReplace)}
         backgrounds={payload().backgrounds}
         onchange={(key: LookKey, value: any) => this.setDefault(key, value)}
       />,
@@ -98,16 +107,58 @@ export default class SkylightPage extends ExtensionPage {
   presetsCard() {
     const presets = this.setting(KEYS.presets);
 
-    return this.card(
-      'presets.title',
-      'presets.help',
+    return this.card('presets.title', 'presets.help', [
       <input
         className="FormControl"
         placeholder="#1f8a6f, #9a4fb0"
         value={hexList(presets()).join(', ')}
         onchange={(e: Event) => presets(JSON.stringify(hexList((e.target as HTMLInputElement).value).slice(0, 6)))}
-      />
+      />,
+      this.switch(KEYS.presetsReplace, 'presets.replace'),
+    ]);
+  }
+
+  thumbnailCard() {
+    const size = this.setting(KEYS.thumbnail);
+    const options: Record<string, Mithril.Children> = {};
+    SIZES.forEach((v) => (options[v] = t(`thumbnail.${v}`)));
+
+    return this.card(
+      'thumbnail.title',
+      'thumbnail.help',
+      <Select options={options} value={SIZES.includes(size()) ? size() : 'off'} onchange={size} />
     );
+  }
+
+  /** One color for a discussion with several colored tags: off, or a color. */
+  multiTagControl() {
+    const value = this.setting(KEYS.multiTag);
+    const color = hex(value());
+
+    return (
+      <div className="SkylightAdmin-multiTag">
+        <Switch state={!!color} onchange={(on: boolean) => value(on ? '#6b7787' : '')}>
+          <span>
+            {t('more.multi_tag')}
+            <small className="helpText">{t('more.multi_tag_help')}</small>
+          </span>
+        </Switch>
+        {color && (
+          <input
+            type="color"
+            className="SkylightAdmin-color"
+            value={color}
+            aria-label={t('more.multi_tag') as any}
+            oninput={(e: InputEvent) => value(hex((e.target as HTMLInputElement).value) || '')}
+          />
+        )}
+      </div>
+    );
+  }
+
+  on(key: string): boolean {
+    const v = this.setting(key)();
+    return !!Number(v) || v === 'true';
   }
 
   backgroundsCard() {
@@ -132,7 +183,7 @@ export default class SkylightPage extends ExtensionPage {
   switch(key: string, label: string) {
     const value = this.setting(key);
     return (
-      <Switch state={!!Number(value()) || value() === 'true'} onchange={(on: boolean) => value(on ? '1' : '0')}>
+      <Switch state={this.on(key)} onchange={(on: boolean) => value(on ? '1' : '0')}>
         <span>
           {t(label)}
           <small className="helpText">{t(`${label}_help`)}</small>

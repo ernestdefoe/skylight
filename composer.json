@@ -29,7 +29,8 @@
         "ernestdefoe/wardrobe": "Offer Skylight beside other themes, chosen by each member and guest.",
         "ernestdefoe/bespoke": "Skylight stays off while Bespoke styles the forum, unless Wardrobe lets each member pick their theme.",
         "fof/discussion-views": "Skylight shows its view count beside the reply count in every list view.",
-        "flarum/sticky": "Sticky discussions' excerpts in the list use Skylight's cleaner text."
+        "flarum/sticky": "Sticky discussions' excerpts in the list use Skylight's cleaner text.",
+        "fof/discussion-thumbnail": "Cards can show each discussion's thumbnail image, at a size the admin picks."
     },
     "autoload": {
         "psr-4": {
@@ -55,7 +56,8 @@
                 "ernestdefoe/wardrobe",
                 "ernestdefoe/bespoke",
                 "fof/discussion-views",
-                "flarum/sticky"
+                "flarum/sticky",
+                "fof/discussion-thumbnail"
             ]
         }
     },

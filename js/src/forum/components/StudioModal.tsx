@@ -50,6 +50,7 @@ export default class StudioModal extends Modal<IInternalModalAttrs> {
           look={look}
           sections={p.sections}
           presets={p.presets}
+          presetsReplace={p.presetsReplace}
           backgrounds={p.backgrounds}
           before={app.allowUserColorScheme && this.mode()}
           onchange={(key: LookKey, value: any) => this.set({ [key]: value })}

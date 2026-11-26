@@ -73,6 +73,13 @@ return [
         ])
         ->whenExtensionEnabled('ernestdefoe-bespoke', fn () => [
             (new Extend\ServiceProvider())->register(Integration\BespokeProvider::class),
+        ])
+        // Cards show fof/discussion-thumbnail's image (its customThumbnail
+        // attribute) at the admin's size; the size reaches the forum only
+        // while that extension is on.
+        ->whenExtensionEnabled('fof-discussion-thumbnail', fn () => [
+            (new Extend\Settings())
+                ->serializeToForum('skylightCardThumbnail', 'ernestdefoe-skylight.card_thumbnail'),
         ]),
 
     // 🚨 Keys written out, never read from class constants while this file
@@ -82,8 +89,16 @@ return [
         ->default('ernestdefoe-skylight.defaults', '')
         // JSON list of Studio sections members may use ('' = all).
         ->default('ernestdefoe-skylight.sections', '')
-        // JSON list of extra accent presets.
+        // JSON list of extra accent presets, added to the built-in six, or
+        // in their place when presets_replace is on (off: installs that
+        // already added extras keep the built-in six).
         ->default('ernestdefoe-skylight.presets', '[]')
+        ->default('ernestdefoe-skylight.presets_replace', false)
+        // One color for a discussion with several colored tags ('' = off:
+        // the first tag's color, as before).
+        ->default('ernestdefoe-skylight.multi_tag_color', '')
+        // Cards: fof/discussion-thumbnail's image (off, small, medium, large).
+        ->default('ernestdefoe-skylight.card_thumbnail', 'off')
         ->default('ernestdefoe-skylight.tag_accent', true)
         ->default('ernestdefoe-skylight.auto_solid', true),
 ];

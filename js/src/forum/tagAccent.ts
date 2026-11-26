@@ -5,19 +5,17 @@ import IndexPage from 'flarum/forum/components/IndexPage';
 import DiscussionPage from 'flarum/forum/components/DiscussionPage';
 import { accents } from '../common/color';
 import { payload } from '../common/look';
+import { tagColor } from '../common/tagColor';
 
 /**
  * Inside a tag (its list, or a discussion in it), buttons, links and focus
  * rings take the tag's color, nudged until it reads well in both schemes.
  * Leaves the page's accent alone everywhere else.
  */
-function tagOf(page: any): any {
+function colorOf(page: any): string | null {
   const discussion = app.current.get('discussion');
-  if (page instanceof DiscussionPage && discussion) {
-    const tags = (discussion as any).tags?.() || [];
-    return tags.find((tag: any) => tag && tag.color() && !tag.parent?.()) || tags.find((tag: any) => tag && tag.color());
-  }
-  if (page instanceof IndexPage) return (app as any).currentTag?.();
+  if (page instanceof DiscussionPage && discussion) return tagColor((discussion as any).tags?.(), true);
+  if (page instanceof IndexPage) return (app as any).currentTag?.()?.color?.() || null;
   return null;
 }
 
@@ -25,7 +23,7 @@ function sync(page: any) {
   const html = document.documentElement;
   if (!html.hasAttribute('data-sky')) return;
 
-  const color = payload().tagAccent ? tagOf(page)?.color?.() : null;
+  const color = payload().tagAccent ? colorOf(page) : null;
   const current = html.getAttribute('data-sky-tag-color');
   if ((color || null) === current) return;
 

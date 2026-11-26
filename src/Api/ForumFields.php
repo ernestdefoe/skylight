@@ -11,6 +11,7 @@ namespace ErnestDefoe\Skylight\Api;
 
 use ErnestDefoe\Skylight\ActiveTheme;
 use ErnestDefoe\Skylight\Backgrounds;
+use ErnestDefoe\Skylight\Color;
 use ErnestDefoe\Skylight\Look;
 use Flarum\Api\Context;
 use Flarum\Api\Schema;
@@ -44,6 +45,8 @@ class ForumFields
                         'canUseStudio' => $this->look->canUseStudio($actor),
                         'tagAccent' => (bool) $this->settings->get('ernestdefoe-skylight.tag_accent'),
                         'presets' => is_array($presets) ? array_values(array_filter(array_map('strval', $presets), fn ($hex) => preg_match('/^#[0-9a-f]{6}$/', $hex))) : [],
+                        'presetsReplace' => (bool) $this->settings->get('ernestdefoe-skylight.presets_replace'),
+                        'multiTagColor' => Color::hex((string) $this->settings->get('ernestdefoe-skylight.multi_tag_color')),
                         'backgrounds' => $this->backgrounds->all(),
                     ];
 

@@ -14,6 +14,8 @@ export interface LookControlsAttrs extends ComponentAttrs {
   sections: string[];
   readability?: boolean;
   presets: string[];
+  /** The presets take the built-in six's place instead of joining them. */
+  presetsReplace?: boolean;
   backgrounds: Record<string, string>;
   /** Shown above the sections (the Studio puts Mode here). */
   before?: Mithril.Children;
@@ -53,8 +55,8 @@ export default class LookControls extends Component<LookControlsAttrs> {
       <div className="Skylight-controls">
         {this.attrs.before}
         {has('accent') && this.section('accent', this.accent())}
-        {has('view') && this.section('view', this.choice('view', { list: 'fas fa-list', cards: 'fas fa-th-large', compact: 'fas fa-bars' }))}
-        {has('background') && this.section('background', this.backgrounds())}
+        {has('view') && this.section('view', this.listView())}
+        {has('background') && this.section('background', [this.backgrounds(), this.row('night', this.choice('night'))])}
         {has('glass') &&
           this.section(
             'glass',
@@ -88,6 +90,16 @@ export default class LookControls extends Component<LookControlsAttrs> {
               {this.toggle('hc')}
             </div>
           )}
+      </div>
+    );
+  }
+
+  /** Discussion list: the view, then where its tags go. */
+  listView() {
+    return (
+      <div>
+        {this.choice('view', { list: 'fas fa-list', cards: 'fas fa-th-large', compact: 'fas fa-bars' })}
+        {this.row('tags', this.choice('tags'))}
       </div>
     );
   }
@@ -154,7 +166,8 @@ export default class LookControls extends Component<LookControlsAttrs> {
 
   accent() {
     const current = this.attrs.look.accent;
-    const swatches: [string, string][] = Object.entries(PRESETS).map(([id, h]) => [h, t(`accents.${id}`) as unknown as string]);
+    const replace = this.attrs.presetsReplace && this.attrs.presets.length > 0;
+    const swatches: [string, string][] = replace ? [] : Object.entries(PRESETS).map(([id, h]) => [h, t(`accents.${id}`) as unknown as string]);
     this.attrs.presets.forEach((h) => swatches.push([h, h]));
     const known = swatches.some(([h]) => h === current);
     const nudged = accents(current).nudged;

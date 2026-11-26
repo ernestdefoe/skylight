@@ -26,8 +26,8 @@ final class Look
     /** Studio sections and the look keys each one controls. Readability is always offered. */
     public const SECTIONS = [
         'accent' => ['accent'],
-        'view' => ['view'],
-        'background' => ['bg'],
+        'view' => ['view', 'tags'],
+        'background' => ['bg', 'night'],
         'glass' => ['glass', 'blur'],
         'corners' => ['radius'],
         'density' => ['density'],
@@ -48,6 +48,8 @@ final class Look
         'font' => ['system', 'inter', 'serif'],
         'motion' => ['full', 'reduced', 'off'],
         'view' => ['list', 'cards', 'compact'],
+        'tags' => ['beside', 'below'],
+        'night' => ['blue', 'black'],
     ];
 
     public const BUILT_IN = [
@@ -61,6 +63,8 @@ final class Look
         'font' => 'system',
         'motion' => 'full',
         'view' => 'list',
+        'tags' => 'beside',
+        'night' => 'blue',
         'rt' => false,
         'hc' => false,
     ];

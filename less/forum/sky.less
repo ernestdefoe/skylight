@@ -45,6 +45,12 @@ html[data-sky][data-theme^="dark"][data-sky-bg="dusk"] {
     linear-gradient(180deg, #1a1726, #10111c);
 }
 html[data-sky][data-theme^="dark"][data-sky-bg="plain"] { --sky-layer: var(--body-bg); }
+// Night tone "black": the sky goes neutral, keeping a faint glow of the accent.
+html[data-sky][data-theme^="dark"][data-sky-night="black"]:not([data-sky-bg="plain"]):not([data-sky-bg^="img"]) {
+  --sky-layer:
+    radial-gradient(800px 600px at 50% 115%, ~"color-mix(in srgb, var(--primary-color) 9%, transparent)", transparent 65%),
+    linear-gradient(180deg, #111112 0%, #0a0a0b 100%);
+}
 
 // The admin's pictures, under a veil so text panes keep their contrast.
 html[data-sky][data-sky-bg^="img"] {

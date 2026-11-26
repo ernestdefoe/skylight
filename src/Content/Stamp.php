@@ -83,6 +83,8 @@ final class Stamp
             'data-sky-font' => (string) $look['font'],
             'data-sky-motion' => (string) $look['motion'],
             'data-sky-view' => (string) $look['view'],
+            'data-sky-tags' => (string) $look['tags'],
+            'data-sky-night' => (string) $look['night'],
             'data-sky-rt' => $look['rt'] ? 'on' : 'off',
             'data-sky-hc' => $look['hc'] ? 'on' : 'off',
         ];

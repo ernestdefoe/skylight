@@ -64,6 +64,22 @@ class LookTest extends TestCase
         $this->assertSame(Look::BUILT_IN['accent'], $look->for($member)['look']['accent']);
     }
 
+    public function test_tag_placement_and_night_tone_are_allow_listed_and_follow_their_sections(): void
+    {
+        $this->assertSame(['tags' => 'below', 'night' => 'black'], Look::sanitize(['tags' => 'below', 'night' => 'black']));
+        $this->assertSame([], Look::sanitize(['tags' => 'above', 'night' => 'purple']));
+
+        // Tags belong to the list view's section, the night tone to the background's.
+        $look = new Look($this->settings(['ernestdefoe-skylight.sections' => '["view"]']));
+        $member = $this->user(['tags' => 'below', 'night' => 'black'], canUseStudio: true);
+        ['look' => $result] = $look->for($member);
+
+        $this->assertSame('below', $result['tags']);
+        $this->assertSame('blue', $result['night']);   // background section is closed
+        $this->assertSame('below', Stamp::attributes($result)['data-sky-tags']);
+        $this->assertSame('blue', Stamp::attributes($result)['data-sky-night']);
+    }
+
     public function test_stamp_attributes_and_style_carry_only_clean_values(): void
     {
         $look = array_merge(Look::BUILT_IN, Look::sanitize(['accent' => '#ffee00', 'view' => 'compact']));

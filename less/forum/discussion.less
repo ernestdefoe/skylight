@@ -15,8 +15,10 @@ html[data-sky] .DiscussionHero-title {
 html[data-sky] .PostStream-item:has(+ .PostStream-item)::after {
   display: none;
 }
+// Density on a discussion: Comfortable leaves a short gap between posts;
+// Compact joins them into one column split by hairlines (below).
 html[data-sky] .PostStream-item + .PostStream-item {
-  margin-top: var(--sky-gap);
+  margin-top: 8px;
 }
 html[data-sky] .PostStream-item > .CommentPost,
 html[data-sky] .PostStream-item > .ReplyPlaceholder {
@@ -96,5 +98,37 @@ html[data-sky] .Scrubber-bar {
     box-shadow: none;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
+  }
+}
+
+// ---- Density "compact": the posts as one column, a line between each ----
+html[data-sky][data-sky-density="compact"] {
+  .PostStream-item + .PostStream-item {
+    margin-top: 0;
+  }
+  .PostStream-item > .CommentPost {
+    border-radius: 0;
+    box-shadow: none;
+
+    &::before { display: none; }
+  }
+  .PostStream-item + .PostStream-item > .CommentPost {
+    border-top-color: var(--sky-hairline);
+  }
+  // Round the column's ends: its first post, and a post after anything that
+  // isn't one (an event line); its last, and a post before anything else.
+  .PostStream-item:first-child > .CommentPost,
+  .PostStream-item:not(:has(> .CommentPost)) + .PostStream-item > .CommentPost {
+    border-top-left-radius: var(--sky-radius);
+    border-top-right-radius: var(--sky-radius);
+    border-top-color: var(--sky-pane-border);
+  }
+  .PostStream-item:not(:first-child):not(:has(> .CommentPost)) + .PostStream-item > .CommentPost {
+    margin-top: 8px;
+  }
+  .PostStream-item:not(:has(+ .PostStream-item > .CommentPost)) > .CommentPost {
+    border-bottom-left-radius: var(--sky-radius);
+    border-bottom-right-radius: var(--sky-radius);
+    box-shadow: var(--sky-shadow);
   }
 }

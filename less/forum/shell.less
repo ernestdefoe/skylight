@@ -183,3 +183,9 @@ html:not(#x-sky)[data-sky] .Post-body a:not(.Button),
 html:not(#x-sky)[data-sky] .Skylight-note a {
   color: var(--link-color);
 }
+
+// The page column is a flex item: without this, one wide row (Compact with
+// every tag shown) widens the whole column instead of shortening its title.
+html[data-sky] .Page-content {
+  min-width: 0;
+}

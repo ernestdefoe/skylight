@@ -4,14 +4,27 @@ import IndexPage from 'flarum/forum/components/IndexPage';
 import DiscussionListItem from 'flarum/forum/components/DiscussionListItem';
 import TerminalPost from 'flarum/forum/components/TerminalPost';
 import Icon from 'flarum/common/components/Icon';
+import Avatar from 'flarum/common/components/Avatar';
+import Link from 'flarum/common/components/Link';
 import abbreviateNumber from 'flarum/common/utils/abbreviateNumber';
 import DiscussionListState from 'flarum/forum/states/DiscussionListState';
 import Tooltip from 'flarum/common/components/Tooltip';
 import Button from 'flarum/common/components/Button';
 import { payload } from '../common/look';
+import { tagColor } from '../common/tagColor';
 import { own, save, show } from './own';
 
 const t = (key: string) => app.translator.trans(`ernestdefoe-skylight.forum.views.${key}`);
+
+const THUMB_SIZES = ['small', 'medium', 'large'];
+
+/** Cards: fof/discussion-thumbnail's picture for this discussion, when the admin turned card pictures on. */
+function cardThumbnail(discussion: any): string | null {
+  const size = app.forum.attribute<string>('skylightCardThumbnail');
+  if (!isCards() || !THUMB_SIZES.includes(size)) return null;
+  const url = discussion.attribute('customThumbnail');
+  return typeof url === 'string' && url ? url : null;
+}
 
 const isCards = () => document.documentElement.hasAttribute('data-sky') && currentView() === 'cards';
 
@@ -83,8 +96,7 @@ function extendList() {
 function extendRows() {
   // Each row carries its tag's color (the card's top edge) and, on Cards, its excerpt.
   extend(DiscussionListItem.prototype, 'elementAttrs', function (attrs: any) {
-    const tags = (this.attrs.discussion as any).tags?.();
-    const color = tags?.find((tag: any) => tag && tag.color())?.color();
+    const color = tagColor((this.attrs.discussion as any).tags?.());
     if (color) attrs.style = { ...(attrs.style || {}), '--sky-tag': color };
   });
 
@@ -131,7 +143,44 @@ function extendRows() {
   });
 }
 
+/** Cards: fof/discussion-thumbnail's picture on top, the author's avatar in the foot. */
+function extendCardThumbnail() {
+  extend(DiscussionListItem.prototype, 'infoItems', function (items) {
+    // Cards: the thumbnail across the card's top. A picture that fails to load
+    // hides itself, leaving the card as it is without one.
+    const thumb = cardThumbnail(this.attrs.discussion);
+    if (thumb)
+      items.add(
+        'skylightThumb',
+        <img
+          className={`Skylight-cardThumb Skylight-cardThumb--${app.forum.attribute('skylightCardThumbnail')}`}
+          src={thumb}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          onerror={(e: Event) => (e.target as HTMLElement).classList.add('is-broken')}
+        />,
+        200
+      );
+  });
+
+  // With the picture on top, the card's foot shows the author's own avatar
+  // again (fof/discussion-thumbnail puts the picture in its place; CSS hides it).
+  extend(DiscussionListItem.prototype, 'authorItems', function (items) {
+    const user = this.attrs.discussion.user();
+    if (!user || !cardThumbnail(this.attrs.discussion)) return;
+    items.add(
+      'skylightAvatar',
+      <Link className="DiscussionListItem-author-avatar Skylight-authorAvatar" href={app.route.user(user)}>
+        <Avatar user={user} title="" />
+      </Link>,
+      90
+    );
+  });
+}
+
 export default function listViews() {
   extendList();
   extendRows();
+  extendCardThumbnail();
 }

@@ -16,6 +16,8 @@ export interface Look {
   font: string;
   motion: string;
   view: string;
+  tags: string;
+  night: string;
   rt: boolean;
   hc: boolean;
 }
@@ -24,8 +26,8 @@ export type LookKey = keyof Look;
 
 export const SECTIONS: Record<string, LookKey[]> = {
   accent: ['accent'],
-  view: ['view'],
-  background: ['bg'],
+  view: ['view', 'tags'],
+  background: ['bg', 'night'],
   glass: ['glass', 'blur'],
   corners: ['radius'],
   density: ['density'],
@@ -45,6 +47,8 @@ export const CHOICES = {
   font: ['system', 'inter', 'serif'],
   motion: ['full', 'reduced', 'off'],
   view: ['list', 'cards', 'compact'],
+  tags: ['beside', 'below'],
+  night: ['blue', 'black'],
 } as const;
 
 export const BUILT_IN: Look = {
@@ -58,6 +62,8 @@ export const BUILT_IN: Look = {
   font: 'system',
   motion: 'full',
   view: 'list',
+  tags: 'beside',
+  night: 'blue',
   rt: false,
   hc: false,
 };
@@ -78,6 +84,10 @@ export interface Payload {
   canUseStudio: boolean;
   tagAccent: boolean;
   presets: string[];
+  /** The admin's presets take the built-in six's place (else they are added). */
+  presetsReplace: boolean;
+  /** One color for a discussion with several colored tags (null = off). */
+  multiTagColor: string | null;
   backgrounds: Record<string, string>;
   blockedByBespoke?: boolean;
 }
@@ -90,6 +100,8 @@ export function payload(): Payload {
     canUseStudio: !!p.canUseStudio,
     tagAccent: !!p.tagAccent,
     presets: p.presets || [],
+    presetsReplace: !!p.presetsReplace,
+    multiTagColor: hex(p.multiTagColor),
     // The PHP side sends {} for "none", which JSON may turn into [].
     backgrounds: Array.isArray(p.backgrounds) ? {} : p.backgrounds || {},
     blockedByBespoke: p.blockedByBespoke,
@@ -148,6 +160,8 @@ export function attributes(look: Look, p: Payload = payload()): { a: Record<stri
       'data-sky-font': look.font,
       'data-sky-motion': look.motion,
       'data-sky-view': look.view,
+      'data-sky-tags': look.tags,
+      'data-sky-night': look.night,
       'data-sky-rt': look.rt ? 'on' : 'off',
       'data-sky-hc': look.hc ? 'on' : 'off',
     },
@@ -183,7 +197,9 @@ export function stamp(look: Look, explicitGlass = false): void {
 
 /* ---- Share codes: SKY- + accent + one character per choice. ---- */
 
-const ORDER = ['bg', 'glass', 'radius', 'density', 'font', 'motion', 'view'] as const;
+// New choices go on the END, so codes made before them still read (1.0 codes
+// have seven choice characters; the two missing ones keep the current look).
+const ORDER = ['bg', 'glass', 'radius', 'density', 'font', 'motion', 'view', 'night', 'tags'] as const;
 
 export function encode(look: Look): string {
   return (
@@ -198,10 +214,10 @@ export function encode(look: Look): string {
 }
 
 export function decode(code: string): Partial<Look> | null {
-  const m = /^SKY-([0-9A-F]{6})([0-9A-Z]{7})([0-9A-Z])([0-9A-Z])([01])([01])$/i.exec(code.trim());
+  const m = /^SKY-([0-9A-F]{6})([0-9A-Z]{7}(?:[0-9A-Z]{2})?)([0-9A-Z])([0-9A-Z])([01])([01])$/i.exec(code.trim());
   if (!m) return null;
   const look: any = { accent: '#' + m[1] };
-  ORDER.forEach((k, i) => (look[k] = (CHOICES[k] as readonly string[])[parseInt(m[2][i], 36)]));
+  ORDER.forEach((k, i) => i < m[2].length && (look[k] = (CHOICES[k] as readonly string[])[parseInt(m[2][i], 36)]));
   look.blur = parseInt(m[3], 36);
   look.scale = parseInt(m[4], 36) + 90;
   look.rt = m[5] === '1';

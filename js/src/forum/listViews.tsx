@@ -149,19 +149,36 @@ function extendCardThumbnail() {
     // Cards: the thumbnail across the card's top. A picture that fails to load
     // hides itself, leaving the card as it is without one.
     const thumb = cardThumbnail(this.attrs.discussion);
-    if (thumb)
-      items.add(
-        'skylightThumb',
-        <img
-          className={`Skylight-cardThumb Skylight-cardThumb--${app.forum.attribute('skylightCardThumbnail')}`}
-          src={thumb}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          onerror={(e: Event) => (e.target as HTMLElement).classList.add('is-broken')}
-        />,
-        200
-      );
+    if (!thumb) return;
+
+    // The picture takes the place of the plain link: bare URLs leave the excerpt.
+    const excerpt = this.attrs.discussion.attribute('skylightExcerpt') as string | null;
+    if (excerpt && items.has('skylightExcerpt')) {
+      const text = excerpt
+        .replace(/https?:\/\/\S*/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      text ? items.setContent('skylightExcerpt', <span className="Skylight-excerpt">{text}</span>) : items.remove('skylightExcerpt');
+    }
+
+    items.add(
+      'skylightThumb',
+      <img
+        className={`Skylight-cardThumb Skylight-cardThumb--${app.forum.attribute('skylightCardThumbnail')}`}
+        src={thumb}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        onerror={(e: Event) => (e.target as HTMLElement).classList.add('is-broken')}
+        // A picture that fits inside the band is shown at its own size, not stretched;
+        // a taller one still fills the band (a thin strip would read worse).
+        onload={(e: Event) => {
+          const img = e.target as HTMLImageElement;
+          if (img.naturalWidth < img.clientWidth && img.naturalHeight <= img.clientHeight) img.classList.add('is-small');
+        }}
+      />,
+      200
+    );
   });
 
   // With the picture on top, the card's foot shows the author's own avatar

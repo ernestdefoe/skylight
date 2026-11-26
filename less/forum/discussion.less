@@ -26,8 +26,29 @@ html[data-sky] .PostStream-item > .ReplyPlaceholder {
 html[data-sky] .PostStream-item > .CommentPost {
   padding-bottom: 8px;
 }
+// A hidden (deleted) post is dimmed part by part, never the whole pane:
+// opacity on the pane makes it a stacking context, and the post's open menu
+// was trapped under the next pane (or the Reply box below it).
 html[data-sky] .PostStream-item > .CommentPost.Post--hidden {
-  opacity: 0.85;
+  .Post-header,
+  .Post-body,
+  .Post-footer,
+  .Post-side {
+    opacity: 0.85;
+  }
+}
+// Collapsed, it is a one-line strip: even padding so the line, its "…" button
+// and the menu button sit on the strip's middle.
+html[data-sky] .PostStream-item > .CommentPost.Post--hidden:not(.revealContent) {
+  padding-top: 12px;
+  padding-bottom: 12px;
+
+  // Core pulls the floated menu button up 27px, sized for its own padding.
+  .Post-actions {
+    margin-top: -29px;
+
+    @media @phone { margin-top: -34px; }
+  }
 }
 html[data-sky] .PostStream-item > .Post--event {
   padding-left: var(--post-padding);
